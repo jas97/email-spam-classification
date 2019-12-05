@@ -14,6 +14,8 @@ install.packages("plsgenomics")
 packageurl <- "https://cran.r-project.org/src/contrib/Archive/KODAMA/KODAMA_0.0.1.tar.gz"
 install.packages(packageurl, repos=NULL, type="source")
 library(KODAMA)
+install.packages("tree")
+library(tree)
 
 # examining the dataset
 dim(ds)
@@ -102,7 +104,7 @@ print(paste("Accuracy on test set for knn.stand.1 = ",
 capital.features <- ds[, 55:57]
 dist.eucl.capital <- knn.dist(capital.features)
 knn.capital.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.eucl.capital, k=1)
-print(paste("Accuracy on test set for knn.stand.1 = ", 
+print(paste("Accuracy on test set for knn.capital.1 = ", 
             sum(knn.capital.1 == factor(ds[test.samples,]$spam))/test.num))
 
 # Predicting based only on words 
@@ -110,7 +112,7 @@ print(paste("Accuracy on test set for knn.stand.1 = ",
 word.features <- ds[, 1:48]
 dist.eucl.word <- knn.dist(word.features)
 knn.words.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.eucl.word, k=1)
-print(paste("Accuracy on test set for knn.stand.1 = ", 
+print(paste("Accuracy on test set for knn.words.1 = ", 
             sum(knn.words.1 == factor(ds[test.samples,]$spam))/test.num))
 
 
@@ -119,7 +121,7 @@ print(paste("Accuracy on test set for knn.stand.1 = ",
 word.cap.features <- ds[, -seq(49, 54, by=1)]
 dist.eucl.word.cap <- knn.dist(word.cap.features)
 knn.word.cap.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.eucl.word.cap, k=1)
-print(paste("Accuracy on test set for knn.stand.1 = ", 
+print(paste("Accuracy on test set for knn.word.cap.1 = ", 
             sum(knn.word.cap.1 == factor(ds[test.samples,]$spam))/test.num))
 
 
@@ -136,9 +138,7 @@ dist.measures <- c("euclidean", "maximum", "manhattan")
 accuracies <- matrix(0, nrow=length(k), ncol=length(dist.measures))
 
 for (i in seq(1, length(k), by=1)) {
-  print(i)
   for (j in seq(1, length(dist.measures), by=1)) {
-    paste("predicting for k = ", i, " and dist measure =  ", dist.measures[j])
     dist <- knn.dist(word.cap.features, dist.meth = dist.measures[j])
     pred <- knn.predict(train.samples, test.samples, ds.labels, dist, k=k[i])
     correct <- sum(pred == factor(ds[test.samples, ]$spam)) / test.num
@@ -153,3 +153,36 @@ for (i in seq(1, length(k), by=1)) {
           dist.measures[j], " = ", accuracies[i,j]))
   }
 }
+
+ 
+## TODO: Napravi spam da bude factor
+## TODO: Da tree vuce originalne neskalirane podatke
+
+# ---------------------------------------
+# Trying different classification methods
+# ---------------------------------------
+
+
+# Decision trees
+
+
+tree.spam <- tree(as.factor(spam)~. , data=ds)
+summary(tree.spam)
+
+# Visualizing tree
+plot(tree.spam)
+text(tree.spam, pretty=0)
+
+# Tree accuracy
+pred.tree <- predict(tree.spam, ds[test.samples,], type="class")
+print(paste("Accuracy with tree = ", sum(pred.tree==as.factor(ds[test.samples,]$spam))/test.num))
+
+
+# Naive Bayes
+bayes <- naiveBayes(as.factor(spam)~. , data=ds)
+summary(bayes)
+
+# Naive Bayes accuracy 
+pred.bayes <- predict(bayes, ds[test.samples, ])
+print(paste("Accuracy with Naive Bayes = ",
+            sum(pred.bayes==as.factor(ds[test.samples, ]$spam))/test.num))
