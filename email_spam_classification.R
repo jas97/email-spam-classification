@@ -26,6 +26,9 @@ summary(ds)
 prop.spam <- sum(ds$spam) / dim(ds)[1]
 print(paste(round(prop.spam * 100, 2), "% of emails in the data set are spam."))
 
+# plotting proportion of spam and not spam emails
+
+
 # splitting the data set into test and train
 # setting seed to make results reproducible
 set.seed(2) 
