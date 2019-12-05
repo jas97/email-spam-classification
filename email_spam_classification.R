@@ -5,6 +5,10 @@ setwd("D:/Fax/Winter 2019 - 2020/Statistical Principles of Data Science/Homework
 ds <- read.table("spambase.csv", header=FALSE, sep=",",col.names = readLines("names.csv"))
 
 # importing necessary libraries
+install.packages('caret')
+library(caret) 
+install.packages('ggplot2')
+library(ggplot2)
 install.packages("class")
 library(class)
 install.packages("devtools")
@@ -27,7 +31,10 @@ prop.spam <- sum(ds$spam) / dim(ds)[1]
 print(paste(round(prop.spam * 100, 2), "% of emails in the data set are spam."))
 
 # plotting proportion of spam and not spam emails
-
+ggplot(ds, aes(factor(x=spam))) +
+  geom_bar(stat="count", fill=c("red", "blue"), alpha=0.4) + 
+  xlab("Spam/Not spam") +
+  scale_x_discrete(labels= c("Not spam", "Spam"))
 
 # splitting the data set into test and train
 # setting seed to make results reproducible
@@ -38,6 +45,9 @@ test.samples <- seq(1:nrow(ds))[-train.samples]
 
 train.num <- length(train.samples)
 test.num <- length(test.samples)
+
+# setting class variable to be a factor
+ds[, ncol(ds)] = as.factor(ds[, ncol(ds)])
 
 # --------------
 # Classification
@@ -58,8 +68,10 @@ knn.default <- knn.predict(train.samples, test.samples, y=ds.labels, dist.matrix
 
 # checking accuracy on test set
 print(paste("Accuracy on test set for knn.default = ", 
-            sum(knn.default == factor(ds[test.samples,]$spam))/test.num))
+            sum(knn.default == ds[test.samples,]$spam)/test.num))
 
+# confusion matrix
+confusionMatrix(factor(knn.default), ds[test.samples,]$spam)
 
 # -------------------------------------
 # Approach 2: Changing distance measure
@@ -73,6 +85,8 @@ knn.manh.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.manh, k=1
 print(paste("Accuracy on test set for knn.manh.1 = ", 
             sum(knn.manh.1 == factor(ds[test.samples,]$spam))/test.num))
 
+#confusion matrix
+confusionMatrix(factor(knn.manh.1), ds[test.samples,]$spam)
 
 # ------------------
 # Maximum distance 
@@ -81,6 +95,8 @@ dist.max <- knn.dist(ds.features, dist.meth='maximum')
 knn.max.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.max, k=1)
 print(paste("Accuracy on test set for knn.max.1 = ", 
             sum(knn.max.1 == factor(ds[test.samples,]$spam))/test.num))
+# confusion matrix
+confusionMatrix(factor(knn.max.1), ds[test.samples,]$spam)
 
 
 # -----------------------------------
@@ -93,6 +109,9 @@ dist.eucl.stand <- knn.dist(ds.features.stand)
 knn.stand.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.eucl.stand, k=1)
 print(paste("Accuracy on test set for knn.stand.1 = ", 
             sum(knn.stand.1 == factor(ds[test.samples,]$spam))/test.num))
+
+# confusion matrix
+confusionMatrix(factor(knn.stand.1), ds[test.samples,]$spam)
 
 
 # ----------------------------
@@ -108,7 +127,8 @@ capital.features <- ds[, 55:57]
 dist.eucl.capital <- knn.dist(capital.features)
 knn.capital.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.eucl.capital, k=1)
 print(paste("Accuracy on test set for knn.capital.1 = ", 
-            sum(knn.capital.1 == factor(ds[test.samples,]$spam))/test.num))
+            sum(knn.capital.1 == ds[test.samples,]$spam)/test.num))
+confusionMatrix(factor(knn.capital.1), ds[test.samples,]$spam)
 
 # Predicting based only on words 
 # Columns[1:48]
@@ -116,8 +136,9 @@ word.features <- ds[, 1:48]
 dist.eucl.word <- knn.dist(word.features)
 knn.words.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.eucl.word, k=1)
 print(paste("Accuracy on test set for knn.words.1 = ", 
-            sum(knn.words.1 == factor(ds[test.samples,]$spam))/test.num))
+            sum(knn.words.1 == ds[test.samples,]$spam)/test.num))
 
+confusionMatrix(factor(knn.words.1), ds[test.samples,]$spam)
 
 # Predicting based on words and capital sequences
 # excluding features regarding characters (Columns[49:54])
@@ -127,6 +148,7 @@ knn.word.cap.1 <- knn.predict(train.samples, test.samples, ds.labels, dist.eucl.
 print(paste("Accuracy on test set for knn.word.cap.1 = ", 
             sum(knn.word.cap.1 == factor(ds[test.samples,]$spam))/test.num))
 
+confusionMatrix(factor(knn.word.cap.1), ds[test.samples,]$spam)
 
 # --------------------
 # Attempt 5: Varying k
