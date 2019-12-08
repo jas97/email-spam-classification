@@ -14,9 +14,13 @@ The data set available on https://archive.ics.uci.edu/ml/datasets/spambase conta
 * Classification tree
 * Naive Bayes 
 
+<img src="images/tree.png">
 
 ## Results
 
 * kNN - best result of % was obtained for k = 1 using the Manhate
 * Classification tree - 88.
 * Naive Bayes - 
+
+<img src="images/tree.png">
+
