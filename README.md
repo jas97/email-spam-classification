@@ -21,7 +21,7 @@ The data set available on https://archive.ics.uci.edu/ml/datasets/spambase conta
 * Classification tree
 * Naive Bayes 
 
-<img src="images/tree.png">
+<img src="images/accuracy.png" width=400 height=400> 
 
 ## Results
 
@@ -29,5 +29,5 @@ The data set available on https://archive.ics.uci.edu/ml/datasets/spambase conta
 * Classification tree - 88.92%
 * Naive Bayes - 70.23%
 
-<img src="images/tree.png">
+<img src="images/tree.png" width=400 height=400>
 
